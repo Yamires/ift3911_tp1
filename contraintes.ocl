@@ -1,0 +1,56 @@
+-- 1) Chaque noeud est identifié par 3 lettres
+context NoeudTransport
+    inv: self.code.size() = 3
+
+-- 2) Chaque Aéroport, Port, Gare possède un code unique respectivement.
+-- L'énoncé demande qu'on fait un seul demande pour tous les modes,
+-- bien que c'est plus courte, mais cela implique qu'un port ne peux pas avoir
+-- le même id qu'un Gare, et donc je les ai séparés
+context Aéroport
+    inv: Aéroport.allInstances()->isUnique(code)
+
+context Port
+    inv: Port.allInstances()->isUnique(code)
+
+context Gare
+    inv: Gare.allInstances()->isUnique(code)
+
+-- 3) L'Aéroport de depart et d'arrivé doit être différent
+-- 4) L'ID XX-1234..  XX est unique pour chaque companie, 1234.. est unique pour chaque vol, dans le companie
+context Vol
+    inv: self.noeudDepart <> self.noeudArrive
+    inv: self.id.substring(1, 2) = self.company.prefixeCompany 
+    inv: self.company.iteneraires->isUnique(id.substring(3, -1))
+
+-- 5) tous les sieges d'un même section ont le même prix
+-- Ceci est déjà renforcé de la facon le système est concu
+
+-- 6) Le port de départ et d'arrivée doit être le même
+-- 7) Une itineraire ne peut pas durer plus que 21 jours
+context ItineraireCroisiere
+    def: duree:Integer = self.DateHeureArrive - self.DateHeureDepart
+    inv: self.noeudDepart = self.noeudArrive
+    inv: duree < 21 * 24 * 60 * 60; -- 21 jours en secondes, assumant "Time" est en secondes
+
+    -- 8) Un paquebot peut être assigné à plusieurs iténeraires tant qu'ils ne se chevauchent pas 
+    -- J'assume qu'on parle dans le contexte d'un seule companie
+
+    -- inv: self.company.itineraires->forAll(itin | itin = self or not self.chevauche(itin))
+
+-- 9) tous les cabines d'une même section ont le même prix
+-- Ceci est déjà renforcé de la facon le système est concu
+
+-- Pour le suivant j'ai pas pus le faire car j'ai pas trouvé un système qui implemente la disponibilité 
+-- de place dans un certain itineraire
+
+-- 10) Le client peut reserver un siège disponible dans un vol donné
+context ClientController::reserverUnite(IdItineraire:String, t:typeSection, p:Preference)
+    pre:
+    post:
+
+-- 11) Un siege reservé devient assigné à un passager une fois payé
+context ClientController::payerReservation(noReservation:int, nom:String, courriel:String, noPasseport:String, carteCredit:CarteCredit)
+    pre:
+    post:
+
+
