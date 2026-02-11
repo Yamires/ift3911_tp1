@@ -19,8 +19,8 @@ context Gare
 -- 4) L'ID XX-1234..  XX est unique pour chaque companie, 1234.. est unique pour chaque vol, dans le companie
 context Vol
     inv: self.noeudDepart <> self.noeudArrive
-    inv: self.id.substring(1, 2) = self.company.prefixeCompany 
-    inv: self.company.iteneraires->isUnique(id.substring(3, -1))
+    inv: self.id.substring(1, 2) = self.compagnie.prefixecompagnie 
+    inv: self.compagnie.iteneraires->isUnique(id.substring(3, -1))
 
 -- 5) tous les sieges d'un même section ont le même prix
 -- Ceci est déjà renforcé de la facon le système est concu
@@ -35,7 +35,7 @@ context ItineraireCroisiere
     -- 8) Un paquebot peut être assigné à plusieurs iténeraires tant qu'ils ne se chevauchent pas 
     -- J'assume qu'on parle dans le contexte d'un seule companie
 
-    -- inv: self.company.itineraires->forAll(itin | itin = self or not self.chevauche(itin))
+    -- inv: self.compagnie.itineraires->forAll(itin | itin = self or not self.chevauche(itin))
 
 -- 9) tous les cabines d'une même section ont le même prix
 -- Ceci est déjà renforcé de la facon le système est concu
