@@ -1,8 +1,6 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<html lang="fr"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Justification — GRASP (Diagramme de classes)</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
   <style>
@@ -11,77 +9,169 @@
     pre, code { background:#f6f8fa; padding:.2rem .4rem; border-radius:4px; }
     h1,h2,h3 { color:#0b3d91 }
     .meta { color:#586069; margin-bottom:1rem }
+    
+    .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .gallery-item { background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:1rem; text-align:center; }
+    .gallery-item img { max-width:100%; height:auto; max-height:400px; border-radius:4px; }
+    .gallery-item p { margin:0.5rem 0 0 0; font-size:0.9rem; color:#444; word-break:break-word; }
   </style>
-</head>
+<style type="text/css" id="operaUserStyle"></style></head>
 <body>
-  <main id="content">
-    Loading document…
-  </main>
+  <main id="content"><h1>Justifications GRASP – Diagramme de classes (Système de réservation multi-transport)</h1>
+<h2>1. Controlleur — <code>ClientController</code></h2>
+<p>Les opérations <em>rechercherVolsDisponibles</em>, <em>rechercheTrajetsTrainDisponibles</em>, <em>rechercheCroisiereDisponibles</em>, <em>reserverUnite</em> et <em>payerReservation</em> sont regroupées dans <code>ClientController</code>.<br>Selon le principe <strong>Controller (GRASP)</strong>, cette classe agit comme point d’entrée des cas d’utilisation côté client et orchestre les interactions entre l’interface utilisateur et le modèle, sans introduire de logique métier inutile dans les entités du domaine.</p>
+<h2>2. Controlleur — <code>ControllerAdmin</code></h2>
+<p>Les cas d’utilisation administratifs (<em>creerNoeud</em>, <em>supprimerNoeud</em>, <em>creerCompagnie</em>, <em>creerVol</em>, <em>creerVehicule</em>, <em>creerSections</em>, etc.) sont centralisés dans <code>ControllerAdmin</code>.<br>Cela respecte le principe <strong>Controlleur</strong>, en séparant clairement les responsabilités entre les fonctionnalités client et administrateur.</p>
+<h2>3. Expert — <code>Itineraire</code></h2>
+<p>La classe <code>Itineraire</code> possède les attributs <code>DateHeureDepart</code> et <code>DateHeureArrive</code>.<br>Elle est donc l’<strong>expert</strong> nécessaire pour implémenter <code>calculerDuree()</code>, plutôt que de déléguer ce calcul à un contrôleur ou à une autre classe.</p>
+<h2>4. Expert — <code>Reservation</code></h2>
+<p><code>Reservation</code> contient <code>dateCreation</code>, <code>dateExpiration</code> et <code>statut</code>, ainsi que les méthodes <code>estExpirer()</code>, <code>expirer()</code> et <code>getStatus()</code>.<br>Selon <strong>Expert</strong>, cette classe est la mieux placée pour gérer son propre cycle de vie et ses règles d’expiration.</p>
+<h2>5. Information Expert — <code>Paiement</code></h2>
+<p>La classe <code>Paiement</code> regroupe <code>carteCredit</code>, <code>datePaiement</code> et <code>noConfirmation</code>.<br>Elle est donc l’expert naturel pour l’opération <code>fairePaiement()</code>, ce qui évite d’introduire de la logique financière dans <code>Reservation</code> ou dans les contrôleurs.</p>
+<h2>6. Createur — <code>ReservationCatalog</code></h2>
+<p><code>ReservationCatalog</code> fournit la méthode <code>creerReservation(itineraire, unite, client)</code>.<br>Comme ce catalogue gère et conserve les réservations, le principe <strong>Createur</strong> justifie qu’il soit responsable de la création des objets <code>Reservation</code>.</p>
+<h2>7. Createur — Compagnies de transport</h2>
+<p>Les classes <code>CompagnieAerienne</code>, <code>CompagnieFerroviaire</code> et <code>CompagnieCroisiere</code> créent respectivement des vols, trajets ferroviaires et itinéraires de croisière.<br>Chaque compagnie possédant les règles et données nécessaires, elles respectent le principe <strong>Creator</strong> pour la création de leurs itinéraires spécifiques.</p>
+<h2>8. Polymorphisme — Hiérarchie <code>Section</code></h2>
+<p>La classe abstraite <code>Section</code> est spécialisée en <code>SectionAvion</code>, <code>SectionTrain</code> et <code>SectionPaquebot</code>.<br>Les comportements comme <code>trouverUniteReservable()</code> ou <code>voirUnitesDisponibles()</code> sont implémentés de façon polymorphique, ce qui respecte le principe <strong>Polymorphisme</strong> et évite les structures conditionnelles complexes.</p>
+<h2>9. Fabrication Pure — <code>ItineraireCatalog</code></h2>
+<p><code>ItineraireCatalog</code> fournit des méthodes de recherche et de consultation (<em>getVols</em>, <em>getTrajets</em>, <em>getCroisieres</em>).<br>Cette classe est une <strong>Fabrication Pure</strong> qui améliore la cohésion du modèle en évitant de surcharger <code>Itineraire</code> ou <code>Compagnie</code> avec des responsabilités de gestion de collections.</p>
+<h2>10. Bas Couplage — <code>PersistantStorage</code></h2>
+<p>La classe <code>PersistantStorage</code> centralise l’accès à la persistance des données.<br>Cela réduit le couplage entre les entités du domaine (<code>Reservation</code>, <code>Client</code>, <code>Itineraire</code>) et les mécanismes de stockage, conformément au principe <strong>Bas Couplage</strong>.</p>
+<h2>11. Haute Cohésion — <code>Vehicule</code></h2>
+<p><code>Vehicule</code> contient une collection de <code>Section</code> et offre des méthodes comme <code>ajouterSection()</code> et <code>getSections()</code>.<br>Cette responsabilité est fortement cohésive : un véhicule est naturellement responsable de la gestion de ses sections.</p>
+<h2>12. Indirection — <code>ResultatRecherche</code></h2>
+<p><code>ResultatRecherche</code> encapsule les données nécessaires à l’affichage (dates, durée, prix, nombre d’unités disponibles).<br>Cette classe joue un rôle d’<strong>Indirection</strong>, en découplant la couche présentation des objets métier complexes et en réduisant le couplage global du système.</p>
+</main>
+  
+  <section id="annex" style="max-width:900px; margin:2rem auto; background:white; padding:2rem; box-shadow:0 6px 24px rgba(27,31,35,0.08); border-radius:8px;">
+    <h2 style="color:#0b3d91; border-bottom:2px solid #0b3d91; padding-bottom:0.5rem;">Annexe — Diagrammes du dossier Devoir1_IFT3911/images</h2>
+    <div class="gallery" id="gallery">
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/verifier_vols_lignes.svg" alt="verifier_vols_lignes.svg" loading="lazy">
+        <p>verifier_vols_lignes.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/verifierItineraireCroisiere.svg" alt="verifierItineraireCroisiere.svg" loading="lazy">
+        <p>verifierItineraireCroisiere.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/VerifierDisponibilite.svg" alt="VerifierDisponibilite.svg" loading="lazy">
+        <p>VerifierDisponibilite.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/SupprimerNoeudTransport.svg" alt="SupprimerNoeudTransport.svg" loading="lazy">
+        <p>SupprimerNoeudTransport.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/supprimerItineraire.svg" alt="supprimerItineraire.svg" loading="lazy">
+        <p>supprimerItineraire.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/supprimerCompgnie.svg" alt="supprimerCompgnie.svg" loading="lazy">
+        <p>supprimerCompgnie.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/setTarifSection.svg" alt="setTarifSection.svg" loading="lazy">
+        <p>setTarifSection.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/reserverSiege.svg" alt="reserverSiege.svg" loading="lazy">
+        <p>reserverSiege.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/payerUnSiege.svg" alt="payerUnSiege.svg" loading="lazy">
+        <p>payerUnSiege.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/modifierVol.svg" alt="modifierVol.svg" loading="lazy">
+        <p>modifierVol.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/ModifierNoeudTransport.svg" alt="ModifierNoeudTransport.svg" loading="lazy">
+        <p>ModifierNoeudTransport.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/modifierCompagnie.svg" alt="modifierCompagnie.svg" loading="lazy">
+        <p>modifierCompagnie.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/ModeleDuDomaine.svg" alt="ModeleDuDomaine.svg" loading="lazy">
+        <p>ModeleDuDomaine.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/diagrammeDeClasse.svg" alt="diagrammeDeClasse.svg" loading="lazy">
+        <p>diagrammeDeClasse.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/Diagramme de Paquets.svg" alt="Diagramme de Paquets.svg" loading="lazy">
+        <p>Diagramme de Paquets.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/creerVol.svg" alt="creerVol.svg" loading="lazy">
+        <p>creerVol.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/creerTrajetFerroviaire.svg" alt="creerTrajetFerroviaire.svg" loading="lazy">
+        <p>creerTrajetFerroviaire.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/creerSectionTrain.svg" alt="creerSectionTrain.svg" loading="lazy">
+        <p>creerSectionTrain.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/creerSectionPaquebot.svg" alt="creerSectionPaquebot.svg" loading="lazy">
+        <p>creerSectionPaquebot.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/creerSection.svg" alt="creerSection.svg" loading="lazy">
+        <p>creerSection.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/CreerNoeudTransport.svg" alt="CreerNoeudTransport.svg" loading="lazy">
+        <p>CreerNoeudTransport.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/creerItineraireCroisiere.svg" alt="creerItineraireCroisiere.svg" loading="lazy">
+        <p>creerItineraireCroisiere.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/creerCompagnie.svg" alt="creerCompagnie.svg" loading="lazy">
+        <p>creerCompagnie.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/consulterItiniraireParCompagnie.svg" alt="consulterItiniraireParCompagnie.svg" loading="lazy">
+        <p>consulterItiniraireParCompagnie.svg</p>
+      </div>
+    
+      <div class="gallery-item">
+        <img src="Devoir1_IFT3911/images/consulterItineraireParNoeudTransport.svg" alt="consulterItineraireParNoeudTransport.svg" loading="lazy">
+        <p>consulterItineraireParNoeudTransport.svg</p>
+      </div>
+    </div>
+  </section>
 
-  <!-- Embedded Markdown source -->
-  <script id="md" type="text/plain">
-# Justifications GRASP – Diagramme de classes (Système de réservation multi-transport)
-
-## 1. Controlleur — `ClientController`
-Les opérations *rechercherVolsDisponibles*, *rechercheTrajetsTrainDisponibles*, *rechercheCroisiereDisponibles*, *reserverUnite* et *payerReservation* sont regroupées dans `ClientController`.  
-Selon le principe **Controller (GRASP)**, cette classe agit comme point d’entrée des cas d’utilisation côté client et orchestre les interactions entre l’interface utilisateur et le modèle, sans introduire de logique métier inutile dans les entités du domaine.
-
-## 2. Controlleur — `ControllerAdmin`
-Les cas d’utilisation administratifs (*creerNoeud*, *supprimerNoeud*, *creerCompagnie*, *creerVol*, *creerVehicule*, *creerSections*, etc.) sont centralisés dans `ControllerAdmin`.  
-Cela respecte le principe **Controlleur**, en séparant clairement les responsabilités entre les fonctionnalités client et administrateur.
-
-## 3. Expert — `Itineraire`
-La classe `Itineraire` possède les attributs `DateHeureDepart` et `DateHeureArrive`.  
-Elle est donc l’**expert** nécessaire pour implémenter `calculerDuree()`, plutôt que de déléguer ce calcul à un contrôleur ou à une autre classe.
-
-## 4. Expert — `Reservation`
-`Reservation` contient `dateCreation`, `dateExpiration` et `statut`, ainsi que les méthodes `estExpirer()`, `expirer()` et `getStatus()`.  
-Selon **Expert**, cette classe est la mieux placée pour gérer son propre cycle de vie et ses règles d’expiration.
-
-## 5. Information Expert — `Paiement`
-La classe `Paiement` regroupe `carteCredit`, `datePaiement` et `noConfirmation`.  
-Elle est donc l’expert naturel pour l’opération `fairePaiement()`, ce qui évite d’introduire de la logique financière dans `Reservation` ou dans les contrôleurs.
-
-## 6. Createur — `ReservationCatalog`
-`ReservationCatalog` fournit la méthode `creerReservation(itineraire, unite, client)`.  
-Comme ce catalogue gère et conserve les réservations, le principe **Createur** justifie qu’il soit responsable de la création des objets `Reservation`.
-
-## 7. Createur — Compagnies de transport
-Les classes `CompagnieAerienne`, `CompagnieFerroviaire` et `CompagnieCroisiere` créent respectivement des vols, trajets ferroviaires et itinéraires de croisière.  
-Chaque compagnie possédant les règles et données nécessaires, elles respectent le principe **Creator** pour la création de leurs itinéraires spécifiques.
-
-## 8. Polymorphisme — Hiérarchie `Section`
-La classe abstraite `Section` est spécialisée en `SectionAvion`, `SectionTrain` et `SectionPaquebot`.  
-Les comportements comme `trouverUniteReservable()` ou `voirUnitesDisponibles()` sont implémentés de façon polymorphique, ce qui respecte le principe **Polymorphisme** et évite les structures conditionnelles complexes.
-
-## 9. Fabrication Pure — `ItineraireCatalog`
-`ItineraireCatalog` fournit des méthodes de recherche et de consultation (*getVols*, *getTrajets*, *getCroisieres*).  
-Cette classe est une **Fabrication Pure** qui améliore la cohésion du modèle en évitant de surcharger `Itineraire` ou `Compagnie` avec des responsabilités de gestion de collections.
-
-## 10. Bas Couplage — `PersistantStorage`
-La classe `PersistantStorage` centralise l’accès à la persistance des données.  
-Cela réduit le couplage entre les entités du domaine (`Reservation`, `Client`, `Itineraire`) et les mécanismes de stockage, conformément au principe **Bas Couplage**.
-
-## 11. Haute Cohésion — `Vehicule`
-`Vehicule` contient une collection de `Section` et offre des méthodes comme `ajouterSection()` et `getSections()`.  
-Cette responsabilité est fortement cohésive : un véhicule est naturellement responsable de la gestion de ses sections.
-
-## 12. Indirection — `ResultatRecherche`
-`ResultatRecherche` encapsule les données nécessaires à l’affichage (dates, durée, prix, nombre d’unités disponibles).  
-Cette classe joue un rôle d’**Indirection**, en découplant la couche présentation des objets métier complexes et en réduisant le couplage global du système.
-
-  </script>
-
-  <!-- marked.js from CDN to render Markdown client-side -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script>
-    try {
-      const md = document.getElementById('md').textContent;
-      const html = marked.parse(md);
-      document.getElementById('content').innerHTML = html;
-    } catch (e) {
-      document.getElementById('content').textContent = 'Erreur lors du rendu du document: ' + e;
-    }
-  </script>
-</body>
-</html>
+</body></html>
