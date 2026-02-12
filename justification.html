@@ -21,6 +21,15 @@
 <h3>Arpad Botond Rigo, 19h, (...1538) - arpad.botond.rigo@umontreal.ca</h3>
 <h3>XXXXX, Xh, (...XXXX) - ...@umontreal.ca</h3>
 <h3>XXXXX, Xh, (...XXXX) - ...@umontreal.ca</h3>
+<h2>Scénarios</h2>
+<h2>verifier_vols_lignes</h2>
+<p>Permet à un client de vérifier la dissponibilité de vols entre deux villes à une date donnée. Le client saisit la ville de départ, la ville d’arrivée et la date souhaitée. Le système affiche une liste de vols disponibles avec les horaires, les compagnies aériennes et les tarifs correspondants.</p>
+<h2>verifierItineraireCroisiere</h2>
+<p>Permet à un client de vérifier la disponibilité d’itinéraires de croisière entre deux ports à une date donnée. Le client saisit le port de départ, le port d’arrivée et la date souhaitée. Le système affiche une liste d’itinéraires de croisière disponibles avec les horaires, les compagnies de croisière et les tarifs correspondants.</p>
+<h2>Réserver siège d'avion</h2>
+<p>Permet à un client de réserver un siège sur un vol spécifique. Le client sélectionne un vol, choisit une section (économique, affaires, première classe) et réserve un siège disponible. Le système confirme la réservation et fournit un confirmation.</p>
+<h2>Payer un siège réservé</h2>
+<p>Permet à un client de payer une réservation de siège. Le client sélectionne une réservation en attente de paiement, saisit les informations de paiement (carte de crédit, date d’expiration, code de sécurité) et confirme le paiement. Le système traite le paiement et met à jour le statut de la réservation.</p>
 <h2>Justifications GRASP – Diagramme de classes (Système de réservation multi-transport)</h2>
 <h2>1. Controlleur — <code>ClientController</code></h2>
 <p>Les opérations <em>rechercherVolsDisponibles</em>, <em>rechercheTrajetsTrainDisponibles</em>, <em>rechercheCroisiereDisponibles</em>, <em>reserverUnite</em> et <em>payerReservation</em> sont regroupées dans <code>ClientController</code>.<br>Selon le principe <strong>Controller (GRASP)</strong>, cette classe agit comme point d’entrée des cas d’utilisation côté client et orchestre les interactions entre l’interface utilisateur et le modèle, sans introduire de logique métier inutile dans les entités du domaine.</p>
