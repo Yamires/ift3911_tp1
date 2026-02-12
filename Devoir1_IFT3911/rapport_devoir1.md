@@ -47,7 +47,7 @@
 
 **9 - Supprimer itinéraire**
 
-![titre image ici](relative_path.svg) 
+![titre image ici](images/supprimerItineraire.svg) 
 
 **10 - Creer section avion**
 
@@ -69,10 +69,6 @@
 
 **15 - Creer section Train** 
 ![titre image ici](images/creerSectionTrain.svg)
-
-![titre image ici](relative_path.svg)
-![titre image ici](relative_path.svg)
-![titre image ici](relative_path.svg) 
 
 <!-- Justification ici (au besoin) -->
 
