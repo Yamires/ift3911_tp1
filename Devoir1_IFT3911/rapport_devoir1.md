@@ -82,16 +82,17 @@
 ![titre image ici](images/diagrammeDeClasse.svg)
 <!--  Justification GRASP ici + autres justifiation au besoin  -->
 
+### Diagramme de paquets
+
+![titre image ici](images/Diagramme%20de%20Paquets.svg)
+
+<!-- Justifacation au besoin -->
+
 ### Diagrammes de collaboration 
 
 #### Vérifier les vols/lignes/itinéraires
 
-<!-- On peut le fusionner avec un alt (if/else) -->
-
-![titre image ici](images/verifier_vols_lignes.svg) 
-
-![titre image ici](images/verifierItineraireCroisiere.svg) 
-
+![titre image ici](images/VerifierDisponibilite.svg)
 
 <!-- Justifacation au besoin -->
 
