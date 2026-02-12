@@ -1,7 +1,7 @@
 # Rapport devoir 1 - IFT3911H26 - 2026.02.12
 
 - Yamir Alejandro Poldo Silva 20240602  yamir.alejandro.poldo.silva@umontreal.ca (temps de travail 25 heures)
-- nom2 matricule2
+- Jean BRDKJI 20300455  jean.brdkji@umontreal.ca (temps de travail xx heures)
 - nom3 matricule3
 
 ## Distribution des tâches 
