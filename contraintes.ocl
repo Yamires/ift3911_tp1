@@ -1,18 +1,35 @@
 -- Chaque noeud est identifié par 3 lettres
+** On note la contrainte est la même pour Aeroport, Port et Gare **
 context NoeudTransport
     inv: self.code.size() = 3
 
 -- Chaque Aéroport, Port, Gare possède un code unique respectivement.
 context Aéroport
-    inv: Aéroport.allInstances()->isUnique(code)
+    inv: Aéroport.allInstances()->isUnique(a | a.code)
 
 context Port
-    inv: Port.allInstances()->isUnique(code)
+    inv: Port.allInstances()->isUnique(p | p.code)
 
 context Gare
-    inv: Gare.allInstances()->isUnique(code)
+    inv: Gare.allInstances()->isUnique(g |g.code)
+
+-- Vol : la partie alphabétique de l'ID est unique par compagnie et la partie numérique est unique par vol au sein de la même compagnie
+context Vol
+inv: 
+  Vol.allInstances()
+    -> select(v | v.compagnie = self.compagnie)
+    -> isUnique(v | v.id.substring(3, v.id.size()))
+
+context Vol
+  inv:
+    Vol.allInstances()
+      -> isUnique(v | v.compagnie.prefixeCompagnie)
+
 
 -- le noeud de depart et d'arrivé doit être différent
+context Vol
+  inv: self.origine <> self.destination
+
 -- L'ID XX-1234..  XX est unique pour chaque companie, 1234.. est unique pour chaque itineraire dans le companie
 context itineraire
     inv: self.depart <> self.arrive
@@ -22,21 +39,30 @@ context itineraire
 -- Tous les cabines/sièges d'une même section ont le même prix
 -- Ceci est déjà renforcé de la facon le système est concu
 context Section
-    inv MemePrixPourTousLesSieges:
-        self.sieges->forAll(s1, s2 |
-            s1.t = s2.t
-        )
+  inv: self.tarifs->size() = 1
 
 -- Le port de départ et d'arrivée doit être le même
+context ItinaireCroisiere
+  inv:
+    self.origine = self.destination
+
 -- Une itineraire ne peut pas durer plus que 21 jours
 context ItineraireCroisiere
     def: duree:Integer = self.DateHeureArrive - self.DateHeureDepart
     inv: self.depart = self.arrive
     inv: duree < 21 * 24 * 60 * 60; -- 21 jours en secondes, assumant "Time" est en secondes
 
-    -- Un paquebot peut être assigné à plusieurs iténeraires tant qu'ils ne se chevauchent pas 
-    -- J'assume qu'on peut le rephraser comme : deux itineraires dont leurs heures se croisent,
-    -- ne peuvent pas avoir le même paquebot
+ou
+
+context ItineraireCroisiere
+  inv:
+    self.calculerDuree() <= 21
+
+
+-- Un paquebot peut être assigné à plusieurs iténeraires tant qu'ils ne se chevauchent pas 
+-- On assume qu'on peut le rephraser comme : deux itineraires dont leurs heures se croisent,
+-- ne peuvent pas avoir le même paquebot
+context Paquebot
     inv: self.compagnie.itineraires->forAll(i1, i2 |
         i1 <> i2 
         and
@@ -46,7 +72,18 @@ context ItineraireCroisiere
         i1.paquebot <> i2.paquebot
     )
 
--- Le client peut reserver un siège disponible dans un vol donné
+    ou 
+
+context Paquebot
+  inv:
+    self.itineraires->forAll(i1, i2 | 
+      i1 <> i2 implies
+        ( i1.DateHeureArrive <= i2.DateHeureDepart
+          or
+          i2.DateHeureArrive <= i1.DateHeureDepart)
+        )
+
+-- Le client peut reserver un siège disponible dans un vol/trajet donné
 context ClientController::reserverUnite(IdItineraire:String, t:typeSection, p:Preference)
     pre SiegeDisponible:
         let itin : Itineraire =
@@ -65,6 +102,33 @@ context ClientController::reserverUnite(IdItineraire:String, t:typeSection, p:Pr
 
     body: 
         result.noReservation
+
+
+ou
+
+context Vol::reserverSiege(t : TypeSection, p : Preference) : Reservation
+  pre:
+    self.voirSiegesDisponibles(t, p)->notEmpty()
+  post: 
+    result <> null 
+    and
+    result.status = StatusReservation::EN_ATTENTE
+    and
+    not self.voirSiegesDisponibles(t, p)->includes(result.unite)
+
+et 
+
+context TrajetFerroriaire::reserverSiege(t : TypeSection, p : Preference) : Reservation
+  pre:
+    self.voirSiegesDisponibles(t, p)->notEmpty()
+  post: 
+    result <> null 
+    and
+    result.statut = StatusReservatuin::EN_ATTENTE
+    and 
+    not self.voirSiegesDisponibles(t, p)->includes(result.unite)
+
+
 
 -- Le client peut reserver une cabine disponible dans un itiniraireCroisiere donné
 context ClientController::reserverUnite(IdItineraire:String, t:typeSection)
@@ -86,6 +150,19 @@ context ClientController::reserverUnite(IdItineraire:String, t:typeSection)
     body: 
         result.noReservation
 
+  ou 
+
+
+context ItineraireCroisiere::reservation(t : TypeSection)
+  pre:
+   self.cabinesDisponibles() > 0 
+  post:
+    Reservation.allInstances()->exists(r |
+      r.itineaire = self 
+      and
+      r.statut = StatutReservation::EN_ATTENTE
+  )
+
 -- Un siege reservé devient assigné à un passager une fois payé
 context ClientController::payerReservation(noReservation:int, nom:String, courriel:String, noPasseport:String, carteCredit:CarteCredit)
     pre ReservationValide:
@@ -102,3 +179,22 @@ context ClientController::payerReservation(noReservation:int, nom:String, courri
             r.statut = StatutReservation::CONFIRMEE and
             r.statut@pre = StatutReservation::EN_ATTENTE and
             r.unite.disponible = false
+
+ou 
+
+context Reservation::confirmerPaiement(p : Paiement,c : Client)
+  pre:
+    self.status = StatusReservation::EN_ATTENTE 
+    and
+    p <> null
+    and
+    c <> null
+  post: 
+    self.status = StatusReservation::CONFIRMEE 
+    and
+    self.unite <> null
+    and
+    self.paiement = p
+    and 
+    self.cleint = c
+
