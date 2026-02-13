@@ -1,86 +1,170 @@
-# Rapport devoir 1 - IFT3911H26 - 2026.02.12
+# Rapport DM1 - IFT3911 – Analyse et conception de logicel - 2026.02.12
 
-- Yamir Alejandro Poldo Silva 20240602  yamir.alejandro.poldo.silva@umontreal.ca (temps de travail 25 heures)
-- Jean BRDKJI 20300455  jean.brdkji@umontreal.ca (temps de travail xx heures)
-- nom3 matricule3
+- Yamir Alejandro Poldo Silva, 30h,  (...0602) -  yamir.alejandro.poldo.silva@umontreal.ca 
+- Jean BRDKJI, 15h, (....0455) -  jean.brdkji@umontreal.ca 
+- Arpad Botond Rigo, 19h, (...1538) - arpad.botond.rigo@umontreal.ca
 
-## Distribution des tâches 
+## Distribution des tâches
 
+Diagramme de classe conceptuel - Yamir
+
+Diagrammes de séquence système - Arpad
+
+Diagramme de classe - Yamir
+
+Diagrammes de séquence ou de collaboration - Arpad
+
+Diagramme de paquets - Jean 
+
+Contraintes OCL - Jean 
+
+Justifications - Arpad et Jean
+
+### Scénarios
+
+#### verifier_vols_lignes
+
+Permet à un client de vérifier la dissponibilité de vols entre deux villes à une date donnée. Le client saisit la ville de départ, la ville d’arrivée et la date souhaitée. Le système affiche une liste de vols disponibles avec les horaires, les compagnies aériennes et les tarifs correspondants.
+
+#### verifierItineraireCroisiere
+
+Permet à un client de vérifier la disponibilité d’itinéraires de croisière entre deux ports à une date donnée. Le client saisit le port de départ, le port d’arrivée et la date souhaitée. Le système affiche une liste d’itinéraires de croisière disponibles avec les horaires, les compagnies de croisière et les tarifs correspondants.
+
+#### éserver siège d'avion
+
+Permet à un client de réserver un siège sur un vol spécifique. Le client sélectionne un vol, choisit une section (économique, affaires, première classe) et réserve un siège disponible. Le système confirme la réservation et fournit un confirmation.
+
+#### Payer un siège réservé
+
+Permet à un client de payer une réservation de siège. Le client sélectionne une réservation en attente de paiement, saisit les informations de paiement (carte de crédit, date d’expiration, code de sécurité) et confirme le paiement. Le système traite le paiement et met à jour le statut de la réservation.
 
 ## Modèle de conception du domaine: 
-
 ### Diagramme de classe conceptuel
 ![diagramme_de_classe_conceptuel](images/ModeleDuDomaine.svg)
--- Justification ici
 
 ### Diagrammes de séquences système
 **1 - Creer un Noeud de transport Aeroport/Port/Gare**
 
-![titre image ici](images/CreerNoeudTransport.svg "Creer un Noeud de transport Aeroport/Port/Gare")
+![](images/CreerNoeudTransport.svg "Creer un Noeud de transport Aeroport/Port/Gare")
 
 **2 - Modifier noeud de tranport**
 
-![titre image ici](images/ModifierNoeudTransport.svg)
+![](images/ModifierNoeudTransport.svg)
 
 **3 - Supprimer noeud de transport**
 
-![titre image ici](images/SupprimerNoeudTransport.svg)
+![](images/SupprimerNoeudTransport.svg)
 
 **4 - Creer compagnie** 
 
-![titre image ici](images/creerCompagnie.svg)
+![](images/creerCompagnie.svg)
 
 **5 - Modifier compagnie** 
-![titre image ici](images/modifierCompagnie.svg)
+
+![](images/modifierCompagnie.svg)
 
 **6 - Supprimer compagnie**
 
-![titre image ici](images/supprimerCompgnie.svg) 
+![](images/supprimerCompgnie.svg) 
 
 **7 - Creer vol**  
 
-![titre image ici](images/creerVol.svg)
+![](images/creerVol.svg)
 
 **8 - Modifier vol**
 
-![titre image ici](images/modifierVol.svg)
+![](images/modifierVol.svg)
 
 **9 - Supprimer itinéraire**
 
-![titre image ici](images/supprimerItineraire.svg) 
+![](images/supprimerItineraire.svg) 
 
 **10 - Creer section avion**
 
-![titre image ici](images/creerSection.svg)
+![](images/creerSection.svg)
 
 **11 - Assigner prix** 
-![titre image ici](images/setTarifSection.svg)
+
+![](images/setTarifSection.svg)
 
 **12 - Consulter**
 
-![titre image ici](images/consulterItineraireParNoeudTransport.svg) 
+![](images/consulterItineraireParNoeudTransport.svg) 
 
 **13 - Creer section paquebot** 
 
-![titre image ici](images/creerSectionPaquebot.svg)
+![](images/creerSectionPaquebot.svg)
 
 **14 - Creer Trajet de train**
-![titre image ici](images/creerTrajetFerroviaire.svg) 
+
+![](images/creerTrajetFerroviaire.svg) 
 
 **15 - Creer section Train** 
-![titre image ici](images/creerSectionTrain.svg)
+
+![](images/creerSectionTrain.svg)
 
 <!-- Justification ici (au besoin) -->
 
 ## Design logiciel 
 
 ### Diagramme de classe
-![titre image ici](images/diagrammeDeClasse.svg)
+![](images/diagrammeDeClasse.svg)
 <!--  Justification GRASP ici + autres justifiation au besoin  -->
+
+#### 1. Contrôleurs
+
+Le système s'appuie sur deux contrôleurs distincts pour séparer les responsabilités et orchestrer les interactions entre l'interface et le système :
+
+**ClientController** : Point d'entrée des cas d'utilisation clients (recherche de vols, trajets, croisières, réservation et paiement).
+
+**ControllerAdmin** : Regroupe les opérations administratives (gestion nœuds, compagnies, vols, véhicules et sections).
+
+Cette structure respecte le principe Contrôleur en agissant comme middleware, évitant ainsi d'alourdir les entités du domaine.
+
+#### 2. Expert d'inforamation
+
+Afin de maintenir une cohésion forte, la logique métier est confiée aux classes qui détiennent l'information nécessaire :
+
+**Itinéraire** : En possédant les dates de départ et d'arrivée, elle est l'expert naturel pour implémenter calculerDuree().
+
+**Réservation** : Détient les dates de création, d'expiration et le statut. Elle gère donc son propre cycle de vie (estExpirer(), expirer()).
+
+**Paiement** : Regroupe les détails de transaction (carte, confirmation) et est responsable de l'opération fairePaiement(), évitant ainsi de surcharger les contrôleurs ou la classe Réservation.
+
+#### 3. Créateur
+
+La responsabilité de l'instanciation est confiée aux classes qui agrègent ou utilisent étroitement les objets créés :
+
+**ReservationCatalog** : Responsable de creerReservation(), car il centralise et gère l'ensemble des instances de réservations.
+
+**Compagnies de transport** : Les classes CompagnieAerienne, CompagnieFerroviaire et CompagnieCroisiere créent leurs offres respectives (vols, trajets, itinéraires), car elles possèdent les règles métier et les données sources nécessaires.
+
+
+#### 4. Fabrication Pure 
+
+Pour maintenir une cohésion forte et éviter de surcharger les entités métier, des classes utilitaires ont été introduites :
+
+  **ItineraireCatalog, ReservationCatalog et AdminCatalog** : Ces classes agissent comme des Fabrications Pures en regroupant les méthodes de gestion et de recherche.
+
+Cela évite d'ajouter des responsabilités de "gestion de collection" ou de "persistance" directement dans les classes Itineraire, Compagnie ou Reservation, gardant ainsi la logique métier simple. 
+
+#### 5. Bas Couplage 
+
+La classe PersistantStorage centralise l’accès à la persistance des données.
+Cela réduit le couplage entre les entités du domaine (Reservation, Client, Itineraire) et les mécanismes de stockage, conformément au principe Bas Couplage.
+
+#### 6. Haute Cohésion — Vehicule
+
+Vehicule contient une collection de Section et offre des méthodes comme ajouterSection() et getSections().
+Cette responsabilité est fortement cohésive : un véhicule est naturellement responsable de la gestion de ses sections.
+
+#### 7. Indirection — ResultatRecherche
+
+La classe ResultatRecherche agit comme une Indirection en regroupant uniquement les données essentielles à l'affichage, telles que les dates, prix et disponibilités. En servant d'intermédiaire entre la présentation et les objets métier, elle réduit le couplage global et permet de modifier la logique interne du système sans impacter l'interface utilisateur.
 
 ### Diagramme de paquets
 
-![titre image ici](images/Diagramme%20de%20Paquets.svg)
+![](images/Diagramme%20de%20Paquets.svg)
 
 <!-- Justifacation au besoin -->
 
@@ -88,19 +172,19 @@
 
 #### Vérifier les vols/lignes/itinéraires
 
-![titre image ici](images/VerifierDisponibilite.svg)
+![](images/VerifierDisponibilite.svg)
 
 <!-- Justifacation au besoin -->
 
 #### Réserver un siège
 
-## ![titre image ici](images/reserverSiege.svg) 
+## ![](images/reserverSiege.svg) 
 
 <!-- Justification au besoin -->
 
 #### Payer un siège
 
-## ![titre image ici](images/payerUnSiege.svg) 
+## ![](images/payerUnSiege.svg) 
 
 ### Contraites OCL
 #### Un aéroport est identifié par trois lettres uniques à chaque aéroport 

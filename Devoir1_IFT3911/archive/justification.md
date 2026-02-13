@@ -1,0 +1,50 @@
+
+# Justifications GRASP – Diagramme de classes  - Système de réservation voyage
+
+## 1. Controlleu:r — `ClientController`
+Les opérations *rechercherVolsDisponibles*, *rechercheTrajetsTrainDisponibles*, *rechercheCroisiereDisponibles*, *reserverUnite* et *payerReservation* sont regroupées dans `ClientController`.  
+Selon le principe **Controlleur**, cette classe agit comme point d’entrée des cas d’utilisation côté client et orchestre les interactions entre l’interface utilisateur et le modèle, sans introduire de logique métier inutile dans les entités du domaine.
+
+## 2. Controlleur — `ControllerAdmin`
+Les cas d’utilisation administratifs (*creerNoeud*, *supprimerNoeud*, *creerCompagnie*, *creerVol*, *creerVehicule*, *creerSections*, etc.) sont centralisés dans `ControllerAdmin`.  
+Cela respecte le principe **Controlleur**, en séparant clairement les responsabilités entre les fonctionnalités client et administrateur.
+
+## 3. Expert — `Itineraire`
+La classe `Itineraire` possède les attributs `DateHeureDepart` et `DateHeureArrive`.  
+Elle est donc l’**expert** nécessaire pour implémenter `calculerDuree()`, plutôt que de déléguer ce calcul à un contrôleur ou à une autre classe.
+
+## 4. Expert — `Reservation`
+`Reservation` contient `dateCreation`, `dateExpiration` et `statut`, ainsi que les méthodes `estExpirer()`, `expirer()` et `getStatus()`.  
+Selon **Expert**, cette classe est la mieux placée pour gérer son propre cycle de vie et ses règles d’expiration.
+
+## 5. Information Expert — `Paiement`
+La classe `Paiement` regroupe `carteCredit`, `datePaiement` et `noConfirmation`.  
+Elle est donc l’expert naturel pour l’opération `fairePaiement()`, ce qui évite d’introduire de la logique financière dans `Reservation` ou dans les contrôleurs.
+
+## 6. Createur — `ReservationCatalog`
+`ReservationCatalog` fournit la méthode `creerReservation(itineraire, unite, client)`.  
+Comme ce catalogue gère et conserve les réservations, le principe **Createur** justifie qu’il soit responsable de la création des objets `Reservation`.
+
+## 7. Createur — Compagnies de transport
+Les classes `CompagnieAerienne`, `CompagnieFerroviaire` et `CompagnieCroisiere` créent respectivement des vols, trajets ferroviaires et itinéraires de croisière.  
+Chaque compagnie possédant les règles et données nécessaires, elles respectent le principe **Creator** pour la création de leurs itinéraires spécifiques.
+
+## 8. Polymorphisme — Hiérarchie `Section`
+La classe abstraite `Section` est spécialisée en `SectionAvion`, `SectionTrain` et `SectionPaquebot`.  
+Les comportements comme `trouverUniteReservable()` ou `voirUnitesDisponibles()` sont implémentés de façon polymorphique, ce qui respecte le principe **Polymorphisme** et évite les structures conditionnelles complexes.
+
+## 9. Fabrication Pure — `ItineraireCatalog`
+`ItineraireCatalog` fournit des méthodes de recherche et de consultation (*getVols*, *getTrajets*, *getCroisieres*).  
+Cette classe est une **Fabrication Pure*:wq* qui améliore la cohésion du modèle en évitant de surcharger `Itineraire` ou `Compagnie` avec des responsabilités de gestion de collections.
+
+## 10. Bas Couplage — `PersistantStorage`
+La classe `PersistantStorage` centralise l’accès à la persistance des données.  
+Cela réduit le couplage entre les entités du domaine (`Reservation`, `Client`, `Itineraire`) et les mécanismes de stockage, conformément au principe **Bas Couplage**.
+
+## 11. Haute Cohésion — `Vehicule`
+`Vehicule` contient une collection de `Section` et offre des méthodes comme `ajouterSection()` et `getSections()`.  
+Cette responsabilité est fortement cohésive : un véhicule est naturellement responsable de la gestion de ses sections.
+
+## 12. Indirection — `ResultatRecherche`
+`ResultatRecherche` encapsule les données nécessaires à l’affichage (dates, durée, prix, nombre d’unités disponibles).  
+Cette classe joue un rôle d’**Indirection**, en découplant la couche présentation des objets métier complexes et en réduisant le couplage global du système.
